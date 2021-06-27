@@ -33,11 +33,12 @@ public class StripedKeysScript : MonoBehaviour {
 
 	string[][] _colorRows = new string[][]
 	{
+		// Blue Magenta, Yellow Red, Green Magenta
 		new string[] { "Red", "Yellow", "Magenta" },
-		new string[] { "Blue", "Magenta", "Green" },
+		new string[] { "Blue", "Magenta", "Green" }, //
 		new string[] { "Blue", "Red", "Yellow" },
 		new string[] { "Magenta", "Blue", "Red" },
-		new string[] { "Yellow", "Red", "Green" },
+		new string[] { "Yellow", "Red", "Green" }, 
 		new string[] { "Green", "Red", "Blue" },
 		new string[] { "Magenta", "Green", "Red" },
 		new string[] { "Blue", "Yellow", "Red" },
@@ -94,7 +95,10 @@ public class StripedKeysScript : MonoBehaviour {
 			if (CheckingForTooManyDupes(check)) { check.Clear(); continue; }
 		}
 		Debug.LogFormat("[Striped Keys #{0}]: The key colors from left to right are: {1}.", _modID, _chosenKeys.Select(x => x.Select(y => _colors[y].name).Join(", ")).Join(" | "));
-	
+
+		bool[] checkies = new bool[_colorRows.Length];
+		int trueRow = 0;
+
 		for (int i = 0; i < _colorRows.Length; i++) 
 		{
 			string c1 = _colorRows[i][0];
@@ -106,18 +110,20 @@ public class StripedKeysScript : MonoBehaviour {
 			{
 				_chosenRow = _colorRows[(i + 1) % _colorRows.Length];
 				_chosenRowIndex = (i + 1) % _colorRows.Length;
+				checkies[i] = true;
+				trueRow = i;
 				break;
 			}
 		}
 
-		if (_chosenRowIndex - 1 == -1) 
+		if (checkies.All(x => !x)) 
 		{
 			_chosenRow = _colorRows[1];
 			_chosenRowIndex = 1;
 			Debug.LogFormat("[Striped Keys #{0}]: No row exists with this set of keys, using the first row as the 'first true row'. Meaning that row 2 will be for submission.", _modID);
 		}
 
-		Debug.LogFormat("[Striped Keys #{0}]: The row that matches the keys is {1} (Row {2}) and the row that is used to solve it will be {3} (Row {4}).", _modID, _colorRows[_chosenRowIndex - 1].Join(", "), _chosenRowIndex, _chosenRow.Join(", "), (_chosenRowIndex + 1) % _colorRows.Length);
+		Debug.LogFormat("[Striped Keys #{0}]: The row that matches the keys is {1} (Row {2}) and the row that is used to solve it will be {3} (Row {4}).", _modID, _colorRows[trueRow].Join(", "), trueRow+1, _chosenRow.Join(", "), (_chosenRowIndex + 1) % _colorRows.Length);
 
 		int[] colorNums = _chosenRow.Select(x => Array.IndexOf(_colors.Select(y => y.name).ToArray(), x)).ToArray();
 		List<int> keyNums = CombinedIntArray(_chosenKeys);
